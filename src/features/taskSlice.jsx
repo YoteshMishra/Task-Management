@@ -9,4 +9,35 @@ const initialState = {
 
 const fetchTodo = createAsyncThunk('tasks/fetchTodo', async () => {
     const response = await fetch('https://jsonplaceholder.typocode.com/todos?_limit=5')
+    const data = response.json()
+    return data.map(task => ({
+        id: task.id,
+        title: task.title,
+        description: '',
+        status: task.completed ? "Completed" : "To Do"
+        }
+    ))
+})
+
+const taskSlice = createSlice({
+    name: 'tasks',
+    initialState,
+    reducers: {
+
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchTodo.pending, (state) => {
+            state.loading = true;
+            state.error = null
+        }),
+        builder.addCase(fetchTodo.fulfilled, (state, action) => {
+            state.loading = false,
+            state.tasks = action.payload
+        }),
+        builder.addCase(fetchTodo.rejected, (state, action) => {
+            state.loading = false,
+            state.error = action.error.message
+        })
+    }
+
 })
